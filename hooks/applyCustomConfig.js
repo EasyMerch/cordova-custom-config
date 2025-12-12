@@ -13,6 +13,8 @@ var deferral, path, cwd;
 var logger,
     fs,
     _ ,
+	iosProject,
+	cordova_ios,
     et,
     plist,
     xcode,
@@ -1023,7 +1025,12 @@ var applyCustomConfig = (function(){
         }
 
         var configData = parseConfigXml(platform),
-            platformPath = path.join(rootdir, 'platforms', platform);
+            platformPath = path.join(rootdir, 'platforms', platform),
+            iosProject;
+        
+        if(cordova_ios){
+            iosProject = new cordova_ios('ios', platformPath);
+        }
 
         _.each(configData, function (configItems, targetName) {
             var targetFilePath;
@@ -1110,6 +1117,9 @@ var applyCustomConfig = (function(){
             tostr = require('tostr'),
             os = require('os'),
             fileUtils = require(path.resolve(hooksPath, "fileUtils.js"))(ctx);
+        if(ctx.opts.platforms.include('ios')){
+            cordova_ios = require('cordova-ios');
+        }
         logger.verbose("Loaded module dependencies");
     };
 
@@ -1119,7 +1129,6 @@ var applyCustomConfig = (function(){
         plugindir = path.join(cwd, 'plugins', context.opts.plugin.id);
 
         configXml = fileUtils.getConfigXml();
-        projectName = fileUtils.getProjectName();
         settings = fileUtils.getSettings();
         var runHook = settings.hook ? settings.hook : defaultHook;
 
@@ -1131,6 +1140,7 @@ var applyCustomConfig = (function(){
         // go through each of the context platforms
         _.each(context.opts.platforms, function (platform, index) {
             platform = platform.trim().toLowerCase();
+            projectName = fileUtils.getProjectName(platform);
             try{
                 updatePlatformConfig(platform);
                 if(index === context.opts.platforms.length - 1){

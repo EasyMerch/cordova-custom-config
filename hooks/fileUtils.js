@@ -7,7 +7,8 @@ var fs,
     path,
     _,
     et,
-    tostr;
+    tostr,
+    iosProject;
 
 /**
  * Provides files utilities
@@ -41,6 +42,17 @@ var fileUtils = (function(){
         return configXmlData;
     };
 
+    fileUtils.getIosProject = function() {
+        if(!iosProject) {
+            var projectRoot = context.opts.projectRoot;
+            var platformPath = path.join(projectRoot, 'platforms', 'ios');
+            var cordova_ios = require('cordova-ios');
+            iosProject = new cordova_ios('ios', platformPath);
+        }
+
+        return iosProject;
+    };
+
     // Returns plugin settings from config.xml
     fileUtils.getSettings = function (){
         if(!settings){
@@ -57,7 +69,14 @@ var fileUtils = (function(){
     };
 
     // Returns project name from config.xml
-    fileUtils.getProjectName = function(){
+    fileUtils.getProjectName = function(platform){
+        if(platform === 'ios'){
+            if(!iosProject){
+                fileUtils.getIosProject();
+            }
+
+            return path.basename(iosProject.locations.xcodeCordovaProj);
+        }
         if(!configXmlData) {
             fileUtils.getConfigXml();
         }
