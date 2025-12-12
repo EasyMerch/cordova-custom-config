@@ -1117,7 +1117,7 @@ var applyCustomConfig = (function(){
             tostr = require('tostr'),
             os = require('os'),
             fileUtils = require(path.resolve(hooksPath, "fileUtils.js"))(ctx);
-        if(ctx.opts.platforms.include('ios')){
+        if(ctx.opts.platforms.includes('ios')){
             cordova_ios = require('cordova-ios');
         }
         logger.verbose("Loaded module dependencies");
